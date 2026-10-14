@@ -80,6 +80,20 @@ class EventCard extends StatelessWidget {
                       Expanded(child: Text(event.locationName)),
                     ],
                   ),
+                  if (event.description.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      event.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -100,7 +114,7 @@ class _ImageHeader extends StatelessWidget {
     if (event.imageUrl.isEmpty) {
       return Container(
         height: height,
-        color: EventHubTheme.muted,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Center(
           child: Icon(Icons.event_outlined,
               size: 48, semanticLabel: 'Event image placeholder'),
@@ -115,7 +129,7 @@ class _ImageHeader extends StatelessWidget {
         semanticLabel: '${event.name} image',
         errorBuilder: (c, e, s) => Container(
           height: height,
-          color: EventHubTheme.muted,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: const Center(
             child: Icon(Icons.broken_image_outlined,
                 size: 48, semanticLabel: 'Event image unavailable'),
@@ -187,9 +201,17 @@ class CategoryChips extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final label = options[i];
+          final isSelected = selected == label;
           return ChoiceChip(
             label: Text(label),
-            selected: selected == label,
+            selected: isSelected,
+            labelStyle: TextStyle(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : null,
+              fontWeight:
+                  isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
             materialTapTargetSize: MaterialTapTargetSize.padded,
             onSelected: (_) => onSelected(label),
           );
