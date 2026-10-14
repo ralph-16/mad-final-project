@@ -1,0 +1,69 @@
+{
+  "events": [
+    {
+      "id": "evt-seminar-web",
+      "name": "Web Development Seminar",
+      "category": "Seminar",
+      "date": "2026-11-15",
+      "startTime": "09:00",
+      "locationName": "School Auditorium",
+      "address": "Main Campus, Building A",
+      "latitude": 14.5995,
+      "longitude": 120.9842,
+      "description": "An introduction to modern web development.",
+      "imageUrl": "STORAGE_URL_1"
+    },
+    {
+      "id": "evt-academic-quiz",
+      "name": "Inter-School Quiz Bee",
+      "category": "Academic",
+      "date": "2026-11-10",
+      "startTime": "13:00",
+      "locationName": "Library Hall",
+      "address": "Main Campus, Library 2F",
+      "latitude": null,
+      "longitude": null,
+      "description": "Annual academic quiz competition. Teams of three.",
+      "imageUrl": "STORAGE_URL_2"
+    },
+    {
+      "id": "evt-sports-fest",
+      "name": "Intramurals Basketball Finals",
+      "category": "Sports",
+      "date": "2026-11-20",
+      "startTime": "15:00",
+      "locationName": "Covered Court",
+      "address": "Sports Complex, Main Campus",
+      "latitude": 14.6,
+      "longitude": 120.985,
+      "description": "Championship game plus awarding ceremony.",
+      "imageUrl": "STORAGE_URL_3"
+    },
+    {
+      "id": "evt-org-fair",
+      "name": "Student Organization Fair",
+      "category": "Organization",
+      "date": "2026-11-08",
+      "startTime": "10:00",
+      "locationName": "Student Plaza",
+      "address": "Main Campus, Student Center",
+      "latitude": null,
+      "longitude": null,
+      "description": "Meet every recognized student org.",
+      "imageUrl": "STORAGE_URL_4"
+    },
+    {
+      "id": "evt-music-night",
+      "name": "Acoustic Night",
+      "category": "Entertainment",
+      "date": "2026-11-25",
+      "startTime": "18:00",
+      "locationName": "Amphitheater",
+      "address": "Main Campus, Amphitheater",
+      "latitude": null,
+      "longitude": null,
+      "description": "Student bands and open-mic performances.",
+      "imageUrl": "STORAGE_URL_5"
+    }
+  ]
+}

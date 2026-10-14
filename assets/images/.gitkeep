@@ -1,0 +1,8 @@
+# Put event images here (JPG/PNG, <500KB each).
+# Expected names (match Firestore imageUrl):
+#   seminar-web.jpg
+#   quiz-bee.jpg
+#   sports-fest.jpg
+#   org-fair.jpg
+#   music-night.jpg
+#   robotics-past.jpg
