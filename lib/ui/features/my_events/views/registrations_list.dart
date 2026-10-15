@@ -89,11 +89,17 @@ class _RegistrationsListState extends State<RegistrationsList> {
     );
   }
 
-  /// Swipe (or detail button) cancels; confirmation is inline here.
+  /// Swipe asks for confirmation first: nothing is deleted until the
+  /// student explicitly confirms. Dismissal keeps item and reminder.
   Future<bool> _confirmCancel(
       BuildContext context, MyEventsViewModel vm, Event event) async {
+    final confirmed = await confirmCancelRegistration(
+      context,
+      eventName: event.name,
+    );
+    if (!confirmed || !context.mounted) return false;
     final userId = context.read<AuthViewModel>().userId;
-    if (userId == null) return false;
+    if (userId == null || !context.mounted) return false;
     final ok = await vm.cancel(userId, event);
     if (context.mounted) {
       final msg = vm.takeNotice() ?? (ok ? 'Cancelled.' : 'Failed.');

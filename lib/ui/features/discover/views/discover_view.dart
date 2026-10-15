@@ -15,12 +15,25 @@ class DiscoverView extends StatefulWidget {
 }
 
 class _DiscoverViewState extends State<DiscoverView> {
+  final _search = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DiscoverViewModel>().load();
     });
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _clearFilters(DiscoverViewModel vm) {
+    _search.clear();
+    vm.clearFilters();
   }
 
   @override
@@ -33,10 +46,35 @@ class _DiscoverViewState extends State<DiscoverView> {
       child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: TextField(
+                controller: _search,
+                onChanged: vm.setSearchQuery,
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  hintText: 'Search events…',
+                  prefixIcon: const Icon(Icons.search_outlined),
+                  suffixIcon: vm.searchQuery.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.clear_outlined),
+                          tooltip: 'Clear search',
+                          onPressed: () {
+                            _search.clear();
+                            vm.setSearchQuery('');
+                          },
+                        ),
+                ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
             child: CategoryChips(
               options: vm.categories,
               selected: vm.selectedCategory,
               onSelected: vm.setCategory,
+              counts: vm.counts,
             ),
           ),
           if (vm.isLoading)
@@ -50,9 +88,20 @@ class _DiscoverViewState extends State<DiscoverView> {
               ),
             )
           else if (vm.filtered.isEmpty)
-            const SliverFillRemaining(
+            SliverFillRemaining(
               child: EmptyState(
-                message: 'No events in this category yet.',
+                message: vm.hasActiveFilters
+                    ? 'No events found.'
+                    : 'No events in this category yet.',
+                details: vm.hasActiveFilters
+                    ? 'Try a different search or category.'
+                    : null,
+                actionLabel:
+                    vm.hasActiveFilters ? 'Clear filters' : null,
+                onAction: vm.hasActiveFilters
+                    ? () => _clearFilters(vm)
+                    : null,
+                icon: Icons.search_off_outlined,
               ),
             )
           else

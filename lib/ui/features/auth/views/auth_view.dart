@@ -65,9 +65,11 @@ class _AuthViewState extends State<AuthView> {
                         prefixIcon: Icon(Icons.email_outlined),
                         border: OutlineInputBorder(),
                       ),
+                      enabled: !vm.isLoading,
                       keyboardType: TextInputType.emailAddress,
                       autofillHints: const [AutofillHints.email],
                       autocorrect: false,
+                      onChanged: (_) => vm.clearError(),
                       validator: (v) =>
                           (v == null || !v.contains('@') || !v.contains('.'))
                               ? 'Enter a valid email address.'
@@ -92,15 +94,27 @@ class _AuthViewState extends State<AuthView> {
                               setState(() => _obscure = !_obscure),
                         ),
                       ),
+                      enabled: !vm.isLoading,
                       obscureText: _obscure,
                       enableSuggestions: false,
                       autocorrect: false,
                       autofillHints: const [AutofillHints.password],
+                      onChanged: (_) => vm.clearError(),
                       validator: (v) =>
                           (v == null || v.length < 6)
                               ? 'Password must be at least 6 characters.'
                               : null,
                     ),
+                    if (!_isSignup)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: vm.isLoading
+                              ? null
+                              : () => _openResetDialog(context),
+                          child: const Text('Forgot password?'),
+                        ),
+                      ),
                     if (vm.errorMessage != null) ...[
                       const SizedBox(height: 8),
                       Semantics(
@@ -135,9 +149,12 @@ class _AuthViewState extends State<AuthView> {
                     TextButton(
                       onPressed: vm.isLoading
                           ? null
-                          : () => setState(() {
-                                _isSignup = !_isSignup;
-                              }),
+                          : () {
+                                vm.clearError();
+                                setState(() {
+                                  _isSignup = !_isSignup;
+                                });
+                              },
                       child: Text(_isSignup
                           ? 'Already have an account? Log in'
                           : 'New here? Create an account'),
@@ -160,5 +177,118 @@ class _AuthViewState extends State<AuthView> {
     if (ok && context.mounted) {
       TextInput.finishAutofillContext();
     }
+  }
+
+  Future<void> _openResetDialog(BuildContext context) async {
+    context.read<AuthViewModel>().clearResetMessages();
+    await showDialog<void>(
+      context: context,
+      builder: (_) => _ForgotPasswordDialog(initialEmail: _email.text),
+    );
+    if (context.mounted) {
+      context.read<AuthViewModel>().clearResetMessages();
+    }
+  }
+}
+
+/// Forgot-password dialog: confirm the account email, request the reset
+/// link, and report success/failure inline without leaving login.
+class _ForgotPasswordDialog extends StatefulWidget {
+  const _ForgotPasswordDialog({required this.initialEmail});
+  final String initialEmail;
+
+  @override
+  State<_ForgotPasswordDialog> createState() => _ForgotPasswordDialogState();
+}
+
+class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _email;
+
+  @override
+  void initState() {
+    super.initState();
+    _email = TextEditingController(text: widget.initialEmail);
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<AuthViewModel>();
+    final sent = vm.resetInfo != null;
+    return AlertDialog(
+      title: const Text('Reset password'),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (!sent)
+              const Text(
+                'Enter your account email and we will send a reset link.',
+              ),
+            if (!sent) const SizedBox(height: 12),
+            if (!sent)
+              TextFormField(
+                controller: _email,
+                enabled: !vm.isLoading,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'you@school.edu',
+                  prefixIcon: Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                autofocus: true,
+                validator: (v) =>
+                    (v == null || !v.contains('@') || !v.contains('.'))
+                        ? 'Enter a valid email address.'
+                        : null,
+              ),
+            if (vm.resetError != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                vm.resetError!,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+            if (sent) ...[
+              const SizedBox(height: 4),
+              Text(vm.resetInfo!),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(sent ? 'Done' : 'Cancel'),
+        ),
+        if (!sent)
+          FilledButton(
+            onPressed: vm.isLoading
+                ? null
+                : () async {
+                    if (!_formKey.currentState!.validate()) return;
+                    await vm.sendPasswordReset(_email.text);
+                  },
+            child: vm.isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child:
+                        CircularProgressIndicator(strokeWidth: 2))
+                : const Text('Send reset link'),
+          ),
+      ],
+    );
   }
 }

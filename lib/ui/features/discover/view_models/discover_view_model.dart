@@ -16,13 +16,40 @@ class DiscoverViewModel extends ChangeNotifier {
   bool isLoading = true;
   String? errorMessage;
   String selectedCategory = Event.allCategory;
+  String searchQuery = '';
 
   List<String> get categories =>
       [Event.allCategory, ...Event.categories];
 
-  List<Event> get filtered => selectedCategory == Event.allCategory
-      ? _events
-      : _events.where((e) => e.category == selectedCategory).toList();
+  /// Live per-category totals over the loaded events (All = everything).
+  Map<String, int> get counts {
+    final map = <String, int>{Event.allCategory: _events.length};
+    for (final c in Event.categories) {
+      map[c] = _events.where((e) => e.category == c).length;
+    }
+    return map;
+  }
+
+  int countFor(String category) => counts[category] ?? 0;
+
+  bool get hasActiveFilters =>
+      selectedCategory != Event.allCategory || searchQuery.isNotEmpty;
+
+  List<Event> get filtered {
+    final q = searchQuery.trim().toLowerCase();
+    return _events.where((e) {
+      if (selectedCategory != Event.allCategory &&
+          e.category != selectedCategory) {
+        return false;
+      }
+      if (q.isEmpty) return true;
+      return e.name.toLowerCase().contains(q) ||
+          e.category.toLowerCase().contains(q) ||
+          e.locationName.toLowerCase().contains(q) ||
+          e.address.toLowerCase().contains(q) ||
+          e.description.toLowerCase().contains(q);
+    }).toList();
+  }
 
   List<Event> get all => List.unmodifiable(_events);
 
@@ -54,6 +81,20 @@ class DiscoverViewModel extends ChangeNotifier {
   void setCategory(String category) {
     if (selectedCategory == category) return;
     selectedCategory = category;
+    notifyListeners();
+  }
+
+  void setSearchQuery(String query) {
+    if (searchQuery == query) return;
+    searchQuery = query;
+    notifyListeners();
+  }
+
+  /// Resets category to All and clears the search (used by Clear filters).
+  void clearFilters() {
+    if (!hasActiveFilters) return;
+    selectedCategory = Event.allCategory;
+    searchQuery = '';
     notifyListeners();
   }
 

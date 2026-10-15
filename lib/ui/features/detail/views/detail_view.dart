@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/widgets.dart';
+import '../../../../data/services/calendar_launcher.dart';
 import '../../../../data/services/maps_launcher.dart';
 import '../../../../domain/models/event.dart';
+import '../../../core/theme.dart';
 import '../../auth/view_models/auth_view_model.dart';
 import '../../discover/view_models/discover_view_model.dart';
 import '../../my_events/view_models/my_events_view_model.dart';
@@ -63,6 +65,23 @@ class DetailView extends StatelessWidget {
                 label: '${current.locationName}\n${current.address}'),
             const SizedBox(height: 8),
             Text(current.description),
+            if (registered && !past) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(Icons.check_circle,
+                      size: 20, color: EventHubTheme.success),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Registered',
+                    style: TextStyle(
+                      color: EventHubTheme.success,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 16),
             OutlinedButton.icon(
               onPressed: () => _openMaps(context, current),
@@ -70,6 +89,15 @@ class DetailView extends StatelessWidget {
               label: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
                 child: Text('Open location in Maps'),
+              ),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () => _openCalendar(context, current),
+              icon: const Icon(Icons.calendar_month_outlined),
+              label: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Text('Add to Calendar'),
               ),
             ),
             const SizedBox(height: 8),
@@ -118,8 +146,13 @@ class DetailView extends StatelessWidget {
 
   Future<void> _cancel(BuildContext context, MyEventsViewModel mine,
       Event event) async {
+    final confirmed = await confirmCancelRegistration(
+      context,
+      eventName: event.name,
+    );
+    if (!confirmed || !context.mounted) return;
     final userId = context.read<AuthViewModel>().userId;
-    if (userId == null) return;
+    if (userId == null || !context.mounted) return;
     final ok = await mine.cancel(userId, event);
     if (context.mounted) {
       final msg = mine.takeNotice() ?? (ok ? 'Cancelled.' : 'Failed.');
@@ -133,6 +166,14 @@ class DetailView extends StatelessWidget {
     if (!ok && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Could not open maps.')));
+    }
+  }
+
+  Future<void> _openCalendar(BuildContext context, Event event) async {
+    final ok = await CalendarLauncher.addEvent(event);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Could not open calendar on this device.')));
     }
   }
 }

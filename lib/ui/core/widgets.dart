@@ -19,7 +19,6 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -43,10 +42,17 @@ class EventCard extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.check_circle,
-                                  size: 18, color: scheme.primary),
+                              const Icon(Icons.check_circle,
+                                  size: 18,
+                                  color: EventHubTheme.success),
                               const SizedBox(width: 4),
-                              const Text('Registered'),
+                              Text(
+                                'Registered',
+                                style: TextStyle(
+                                  color: EventHubTheme.success,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -149,7 +155,7 @@ class _ImageHeader extends StatelessWidget {
               child: Center(child: CircularProgressIndicator())),
       errorBuilder: (c, e, s) => Container(
         height: height,
-        color: EventHubTheme.muted,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Center(
           child: Icon(Icons.broken_image_outlined,
               size: 48, semanticLabel: 'Event image unavailable'),
@@ -178,17 +184,25 @@ class _CategoryTag extends StatelessWidget {
 }
 
 /// 48dp category filter chips in a horizontal list.
+/// Pass [counts] (e.g. from DiscoverViewModel) to show per-category totals.
 class CategoryChips extends StatelessWidget {
   const CategoryChips({
     super.key,
     required this.options,
     required this.selected,
     required this.onSelected,
+    this.counts,
   });
 
   final List<String> options;
   final String selected;
   final ValueChanged<String> onSelected;
+  final Map<String, int>? counts;
+
+  String _label(String option) {
+    final n = counts?[option];
+    return n == null ? option : '$option ($n)';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +217,10 @@ class CategoryChips extends StatelessWidget {
           final label = options[i];
           final isSelected = selected == label;
           return ChoiceChip(
-            label: Text(label),
+            label: Text(
+              _label(label),
+              overflow: TextOverflow.ellipsis,
+            ),
             selected: isSelected,
             labelStyle: TextStyle(
               color: isSelected
@@ -241,9 +258,23 @@ class LoadingState extends StatelessWidget {
 }
 
 class EmptyState extends StatelessWidget {
-  const EmptyState({super.key, required this.message, this.icon});
+  const EmptyState({
+    super.key,
+    required this.message,
+    this.icon,
+    this.details,
+    this.actionLabel,
+    this.onAction,
+  });
   final String message;
   final IconData? icon;
+
+  /// Optional calm explanation shown under the message (e.g. how to recover).
+  final String? details;
+
+  /// Optional recovery action (e.g. "Clear filters").
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -257,9 +288,62 @@ class EmptyState extends StatelessWidget {
                 size: 48, semanticLabel: 'No events'),
             const SizedBox(height: 12),
             Text(message, textAlign: TextAlign.center),
+            if (details != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                details!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant,
+                    ),
+              ),
+            ],
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: onAction,
+                icon: const Icon(Icons.filter_alt_off_outlined),
+                label: Text(actionLabel!),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
+}
+
+/// Reusable cancellation confirmation. Returns true only on explicit
+/// confirmation; dismissal or "Keep" leaves everything unchanged.
+Future<bool> confirmCancelRegistration(
+  BuildContext context, {
+  required String eventName,
+}) async {
+  final scheme = Theme.of(context).colorScheme;
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (c) => AlertDialog(
+      title: const Text('Cancel Registration?'),
+      content: Text(
+        'Are you sure you want to cancel your registration for "$eventName"?',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(c).pop(false),
+          child: const Text('Keep Registration'),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: scheme.error,
+            foregroundColor: scheme.onError,
+          ),
+          onPressed: () => Navigator.of(c).pop(true),
+          child: const Text('Cancel Registration'),
+        ),
+      ],
+    ),
+  );
+  return confirmed ?? false;
 }

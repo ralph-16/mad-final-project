@@ -23,6 +23,25 @@ class AuthViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
+  /// Password-reset flow state. Kept separate from [errorMessage] so the
+  /// reset dialog shows its own inline result without touching the form.
+  String? resetError;
+  String? resetInfo;
+
+  /// Clears a stale form error as soon as the user starts correcting input
+  /// (or switches modes), so old messages never linger over fresh typing.
+  void clearError() {
+    if (errorMessage != null) {
+      errorMessage = null;
+      notifyListeners();
+    }
+  }
+
+  void clearResetMessages() {
+    resetError = null;
+    resetInfo = null;
+  }
+
   Future<bool> signIn(String email, String password) =>
       _run(() => _auth.signIn(email, password));
 
@@ -31,6 +50,26 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  /// Sends a password-reset email. Returns true when the request was
+  /// accepted. Loading always resets so the form stays usable.
+  Future<bool> sendPasswordReset(String email) async {
+    resetError = null;
+    resetInfo = null;
+    isLoading = true;
+    notifyListeners();
+    try {
+      await _auth.sendPasswordReset(email);
+      resetInfo = 'Password reset email sent. Check your inbox.';
+      return true;
+    } catch (e) {
+      resetError = friendlyResetError(e);
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<bool> _run(Future<void> Function() call) async {
