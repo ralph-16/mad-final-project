@@ -57,6 +57,7 @@ the dependency is declared but no code path uses it.
 | `MyEventsViewModel` | registrations⋈events join, upcoming/history split, register/cancel + reminder side effects | both repositories, `NotificationService` | `DiscoverView` (badges), `DetailView`, `RegistrationsList` |
 | `EventCard` / `CategoryChips` / states (`ui/core/widgets.dart`) | shared presentation only, no I/O | `Event` | Discover, My Events, History |
 | `EventHubTheme` | Sunny Day light/dark Material 3 tokens (orange primary, golden selected states, warm surfaces, green success) | Flutter SDK | `MaterialApp` |
+| `ThemeController` | light/dark/system mode + sun-moon toggle, persisted via shared_preferences | `shared_preferences` | `MaterialApp.themeMode`, HomeShell + AuthView toggle buttons |
 | Repositories (×2 impls each) | Firestore access *or* in-memory fakes behind one interface | Firestore SDK / nothing | view-models only |
 | `MapsLauncher` | builds Maps URL, launches externally | `url_launcher` | `DetailView` |
 | `CalendarLauncher` | Google Calendar template URL (documented 2h end fallback), external launch | `url_launcher` | `DetailView` |

@@ -111,6 +111,7 @@ Excluded as noise: `build/`, `.dart_tool/`, `.idea/`, `.vscode/`, `.agents/`
 |---|---|---|---|
 | Auth | sign-up/in/out, UID stream, friendly error strings, password reset | `data/services/auth_service.dart`; `ui/features/auth/view_models/auth_view_model.dart`, `ui/features/auth/views/auth_view.dart` | `firebase_auth` / in-memory mock |
 | Discover | event stream, category filter, text search, counts | `data/services/event_repository.dart`; `ui/features/discover/view_models/discover_view_model.dart`, `ui/features/discover/views/discover_view.dart` | `Event` model |
+| Theme mode | light/dark/system + persisted toggle | `ui/core/theme_controller.dart` (`shared_preferences`) | `main.dart`, HomeShell + AuthView |
 | Detail | full event display, register/cancel buttons, maps + calendar buttons | `ui/features/detail/views/detail_view.dart` | Discover + MyEvents VMs, `MapsLauncher`, `CalendarLauncher` |
 | My Events / History | registrations joined with events, upcoming-vs-past split, register/cancel + reminders | `data/services/registration_repository.dart`, `data/services/notification_service.dart`; `ui/features/my_events/view_models/my_events_view_model.dart`, `ui/features/my_events/views/registrations_list.dart` | both repositories, notifications |
 | Shared UI | theme tokens, event card, filter chips, loading/empty states | `ui/core/theme.dart`, `ui/core/widgets.dart` | `Event` model |

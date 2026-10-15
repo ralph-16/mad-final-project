@@ -10,6 +10,7 @@ import 'data/services/notification_service.dart';
 import 'data/services/registration_repository.dart';
 import 'firebase_options.dart';
 import 'ui/core/theme.dart';
+import 'ui/core/theme_controller.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
 import 'ui/features/auth/views/auth_view.dart';
 import 'ui/features/detail/views/detail_view.dart';
@@ -35,12 +36,15 @@ Future<bool> _initFirebase() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final firebaseReady = await _initFirebase();
-  runApp(EventHubApp(firebaseReady: firebaseReady));
+  final theme = ThemeController();
+  await theme.load();
+  runApp(EventHubApp(firebaseReady: firebaseReady, theme: theme));
 }
 
 class EventHubApp extends StatelessWidget {
-  const EventHubApp({super.key, required this.firebaseReady});
+  const EventHubApp({super.key, required this.firebaseReady, required this.theme});
   final bool firebaseReady;
+  final ThemeController theme;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +62,7 @@ class EventHubApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: theme),
         ChangeNotifierProvider(
             create: (_) => AuthViewModel(auth)),
         ChangeNotifierProvider(
@@ -70,21 +75,24 @@ class EventHubApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp(
-        title: 'EventHub',
-        theme: EventHubTheme.light(),
-        darkTheme: EventHubTheme.dark(),
-        home: const AuthGate(),
-        onGenerateRoute: (settings) {
-          if (settings.name == '/detail' &&
-              settings.arguments is String) {
-            return MaterialPageRoute(
-              builder: (_) =>
-                  DetailView(eventId: settings.arguments as String),
-            );
-          }
-          return null;
-        },
+      child: Builder(
+        builder: (context) => MaterialApp(
+              title: 'EventHub',
+              theme: EventHubTheme.light(),
+              darkTheme: EventHubTheme.dark(),
+              themeMode: context.watch<ThemeController>().mode,
+              home: const AuthGate(),
+              onGenerateRoute: (settings) {
+                if (settings.name == '/detail' &&
+                    settings.arguments is String) {
+                  return MaterialPageRoute(
+                    builder: (_) =>
+                        DetailView(eventId: settings.arguments as String),
+                  );
+                }
+                return null;
+              },
+            ),
       ),
     );
   }
@@ -124,12 +132,18 @@ class _HomeShellState extends State<HomeShell> {
       RegistrationsList(showPast: false, onOpenDetail: _openDetail),
       RegistrationsList(showPast: true, onOpenDetail: _openDetail),
     ];
-    const labels = ['Discover', 'My Events', 'History'];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(labels[_tab]),
+        title: const Text('EventHub'),
         actions: [
+          IconButton(
+            icon: Icon(context.watch<ThemeController>().toggleIcon),
+            tooltip:
+                context.watch<ThemeController>().toggleTooltip,
+            onPressed: () =>
+                context.read<ThemeController>().toggle(),
+          ),
           IconButton(
             icon: const Icon(Icons.logout_outlined),
             tooltip: 'Log out',

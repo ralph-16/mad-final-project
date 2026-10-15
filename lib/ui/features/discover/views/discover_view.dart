@@ -70,11 +70,29 @@ class _DiscoverViewState extends State<DiscoverView> {
             ),
           ),
           SliverToBoxAdapter(
-            child: CategoryChips(
-              options: vm.categories,
-              selected: vm.selectedCategory,
-              onSelected: vm.setCategory,
-              counts: vm.counts,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+              child: DropdownButtonFormField<String>(
+                key: ValueKey(vm.selectedCategory),
+                initialValue: vm.selectedCategory,
+                decoration: const InputDecoration(
+                  labelText: 'Category',
+                  prefixIcon: Icon(Icons.filter_list_outlined),
+                ),
+                items: [
+                  for (final c in vm.categories)
+                    DropdownMenuItem(
+                      value: c,
+                      child: Text(
+                        '$c (${vm.countFor(c)})',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                ],
+                onChanged: (c) {
+                  if (c != null) vm.setCategory(c);
+                },
+              ),
             ),
           ),
           if (vm.isLoading)

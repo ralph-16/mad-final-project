@@ -99,10 +99,10 @@ no admin screens, `firestore.rules` denies all client event writes).
    error strings on failure. Fields stay explicitly enabled outside loading
    and stale errors clear as the user retypes. "Forgot password?" opens a
    dialog that sends a reset link without leaving login.
-3. `HomeShell` shows Discover; `DiscoverViewModel.load()` subscribes to the
+3. `HomeShell` shows Discover under a persistent "EventHub" app bar; `DiscoverViewModel.load()` subscribes to the
    `events` collection ordered by date (`lib/data/services/event_repository.dart:18-28`);
-   the search field filters name/category/venue/address/description and chips
-   show live counts; combined filters narrow together, and "Clear filters"
+   the search field filters name/category/venue/address/description and the
+   Category dropdown shows live counts; combined filters narrow together, and "Clear filters"
    resets both. A zero-result combination shows "No events found." (kept
    distinct from load errors).
 4. Student taps a card → `/detail` route with event ID → `DetailView` looks the
@@ -187,11 +187,11 @@ images are bundled in `assets/images/`).
 ## 10. Current Implementation Status
 
 - **Implemented (verified in code + tests):** all 8 MVP user stories — auth
-  (+ password reset), browse (+ search, counts, clear-filters), filter,
-  details + maps + Google Calendar link, register without duplicates, My
-  Events, confirmed cancel + reminder cancel, history,
-  permission-tolerant reminders, per-student privacy. Sunny Day theme +
-  green registered indicators throughout.
+  (+ password reset), browse (+ search, counted dropdown filter,
+  clear-filters), filter, details + maps + Google Calendar link, register
+  without duplicates, My Events, confirmed cancel + reminder cancel, history,
+  permission-tolerant reminders, per-student privacy. Sunny Day theme (with
+  persisted light/dark toggle) + green registered indicators throughout.
 - **Partially implemented:** realtime updates — Discover streams events live,
   but My Events reloads by fetch-after-mutate (unused `watchForStudent` stream
   exists but is unwired); web build has no reminders.

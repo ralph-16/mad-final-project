@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
 import 'package:final_project/data/services/auth_service.dart';
+import 'package:final_project/ui/core/theme_controller.dart';
 import 'package:final_project/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:final_project/ui/features/auth/views/auth_view.dart';
 
@@ -50,8 +51,14 @@ class _FlakyAuth implements AuthService {
 
 Future<void> _pumpAuth(WidgetTester tester, AuthService auth) async {
   await tester.pumpWidget(
-    ChangeNotifierProvider<AuthViewModel>(
-      create: (_) => AuthViewModel(auth),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ThemeController>(
+            create: (_) => ThemeController()),
+        ChangeNotifierProvider<AuthViewModel>(
+          create: (_) => AuthViewModel(auth),
+        ),
+      ],
       child: const MaterialApp(home: AuthView()),
     ),
   );

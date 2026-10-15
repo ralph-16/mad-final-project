@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../view_models/auth_view_model.dart';
+import '../../../core/theme_controller.dart';
 
 /// Login + signup in one screen (toggle), email/password only per spec.
 /// Labels stay visible; errors render inline under the form.
@@ -42,6 +43,22 @@ class _AuthViewState extends State<AuthView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Row(
+                      children: [
+                        const Spacer(),
+                        IconButton(
+                          icon: Icon(context
+                              .watch<ThemeController>()
+                              .toggleIcon),
+                          tooltip: context
+                              .watch<ThemeController>()
+                              .toggleTooltip,
+                          onPressed: () => context
+                              .read<ThemeController>()
+                              .toggle(),
+                        ),
+                      ],
+                    ),
                     const Icon(Icons.event_outlined,
                         size: 56, semanticLabel: 'EventHub logo'),
                     const SizedBox(height: 12),
