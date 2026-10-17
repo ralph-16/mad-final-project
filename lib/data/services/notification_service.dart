@@ -1,3 +1,5 @@
+import 'dart:async' show Timer;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
@@ -56,8 +58,14 @@ class LocalNotificationService implements NotificationService {
   final FlutterLocalNotificationsPlugin _plugin;
   bool _ready = false;
 
-  Future<void> _ensureReady() async {
-    if (_ready) return;
+  /// Web fallback timers for reminders keyed by notification ID.
+  ///
+  /// Browsers cannot schedule notifications while closed, so the 1-hour
+  /// reminder is kept alive with a Dart timer while the app tab is open.
+  final Map<int, Timer> _webTimers = {};
+
+  Future<bool> _ensureReady() async {
+    if (_ready) return true;
     try {
       tzdata.initializeTimeZones();
     } catch (_) {
@@ -65,16 +73,27 @@ class LocalNotificationService implements NotificationService {
     }
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const darwin = DarwinInitializationSettings();
-    await _plugin.initialize(
-      settings: const InitializationSettings(android: android, iOS: darwin),
-    );
-    _ready = true;
+    try {
+      final ok = await _plugin.initialize(
+        settings: const InitializationSettings(android: android, iOS: darwin),
+      );
+      _ready = ok ?? true; // web returns true/false; some return null
+    } catch (e) {
+      debugPrint('Notification init failed: $e');
+    }
+    return _ready;
   }
 
   @override
   Future<bool> requestPermission() async {
     try {
-      await _ensureReady();
+      if (!await _ensureReady()) return false;
+      if (kIsWeb) {
+        final web = _plugin.resolvePlatformSpecificImplementation<
+            WebFlutterLocalNotificationsPlugin>();
+        final granted = await web?.requestNotificationsPermission();
+        return granted ?? false;
+      }
       final android =
           _plugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
@@ -128,6 +147,20 @@ class LocalNotificationService implements NotificationService {
     required DateTime when,
   }) async {
     if (when.isBefore(DateTime.now())) return; // past: nothing to remind
+    if (kIsWeb) {
+      // Browsers have no OS-level scheduler: show via timer while open.
+      try {
+        await _ensureReady();
+        _webTimers.remove(id)?.cancel();
+        _webTimers[id] = Timer(when.difference(DateTime.now()), () async {
+          _webTimers.remove(id);
+          await _plugin.show(id: id, title: title, body: body);
+        });
+      } catch (e) {
+        debugPrint('Web reminder scheduling failed: $e');
+      }
+      return;
+    }
     try {
       await _ensureReady();
       await _plugin.zonedSchedule(
@@ -153,6 +186,7 @@ class LocalNotificationService implements NotificationService {
 
   @override
   Future<void> cancelReminder(int id) async {
+    _webTimers.remove(id)?.cancel();
     try {
       await _plugin.cancel(id: id);
     } catch (e) {
