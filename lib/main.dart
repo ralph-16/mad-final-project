@@ -122,6 +122,22 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _tab = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    // Register/Cancel state on the detail page and Discover badges depend
+    // on this student's registrations, so fetch them at sign-in as well —
+    // not only when the My Events / History tabs open, since Discover is
+    // the entry tab and its detail view reads MyEventsViewModel directly.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final userId = context.read<AuthViewModel>().userId;
+      if (userId != null) {
+        context.read<MyEventsViewModel>().load(userId);
+      }
+    });
+  }
+
   void _openDetail(String eventId) {
     Navigator.of(context).pushNamed('/detail', arguments: eventId);
   }
