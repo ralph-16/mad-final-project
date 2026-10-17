@@ -84,10 +84,18 @@ class MyEventsViewModel extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    // Reminder is best-effort: registration stands either way.
+    // Confirmation + reminder are best-effort: registration stands either way.
     final granted = await notifications.requestPermission();
     remindersAvailable = granted;
     if (granted) {
+      // Immediate confirmation naming how far out the event is.
+      await notifications.showNow(
+        id: confirmationIdFor(event.id),
+        title: 'Registration confirmed',
+        body:
+            '${event.name} starts ${timeUntilLabel(event.dateTime)} — '
+            '${formatReminderWhen(event.dateTime)} at ${event.locationName}',
+      );
       await notifications.scheduleReminder(
         id: reminderIdFor(event.id),
         title: 'Upcoming: ${event.name}',

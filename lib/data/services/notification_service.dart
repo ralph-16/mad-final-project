@@ -7,6 +7,14 @@ import 'package:timezone/timezone.dart' as tz;
 /// the ViewModel then shows a notice instead of scheduling.
 abstract class NotificationService {
   Future<bool> requestPermission();
+
+  /// Shows a notification right away (e.g. registration confirmation).
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+  });
+
   Future<void> scheduleReminder({
     required int id,
     required String title,
@@ -22,6 +30,25 @@ int reminderIdFor(String eventId) => eventId.hashCode & 0x7fffffff;
 /// One hour before start, per spec.
 DateTime reminderTimeFor(DateTime start) =>
     start.subtract(const Duration(hours: 1));
+
+/// Distinct ID per event so confirmation and reminder don't collide.
+int confirmationIdFor(String eventId) =>
+    reminderIdFor(eventId) ^ 0x1fffffff;
+
+/// Human phrase for how far from now [when] is, e.g. 'in 2 days'.
+String timeUntilLabel(DateTime when) {
+  final d = when.difference(DateTime.now());
+  if (d.inMinutes < 1) return 'very soon';
+  if (d.inMinutes < 60) return 'in ${d.inMinutes} min';
+  if (d.inHours < 24) {
+    final m = d.inMinutes % 60;
+    final h = d.inHours;
+    final hs = h == 1 ? '1 hr' : '$h hrs';
+    return m == 0 ? 'in $hs' : 'in $hs ${m}min';
+  }
+  final days = d.inDays;
+  return 'in $days day${days == 1 ? '' : 's'}';
+}
 
 class LocalNotificationService implements NotificationService {
   LocalNotificationService() : _plugin = FlutterLocalNotificationsPlugin();
@@ -63,6 +90,33 @@ class LocalNotificationService implements NotificationService {
     } catch (e) {
       debugPrint('Notification permission failed: $e');
       return false;
+    }
+  }
+
+  @override
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    try {
+      await _ensureReady();
+      await _plugin.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'eventhub_confirmations',
+            'Registration confirmations',
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Show notification failed: $e');
     }
   }
 
@@ -111,6 +165,13 @@ class LocalNotificationService implements NotificationService {
 class NoopNotificationService implements NotificationService {
   @override
   Future<bool> requestPermission() async => false;
+
+  @override
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+  }) async {}
 
   @override
   Future<void> scheduleReminder({
