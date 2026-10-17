@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../view_models/auth_view_model.dart';
@@ -59,8 +60,12 @@ class _AuthViewState extends State<AuthView> {
                         ),
                       ],
                     ),
-                    const Icon(Icons.event_outlined,
-                        size: 56, semanticLabel: 'EventHub logo'),
+                    SvgPicture.asset(
+                      'assets/images/logo.svg',
+                      width: 56,
+                      height: 56,
+                      semanticsLabel: 'EventHub logo',
+                    ),
                     const SizedBox(height: 12),
                     Text('EventHub',
                         textAlign: TextAlign.center,
