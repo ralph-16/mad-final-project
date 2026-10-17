@@ -55,3 +55,4 @@ android/key.properties
 
 # Firebase service account (never commit)
 scripts/service_account.json
+scripts/venv/

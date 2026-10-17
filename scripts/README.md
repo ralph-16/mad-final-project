@@ -8,14 +8,16 @@ Creates a historical event + registration for an existing Firebase user so you c
    - Firebase Console → Project settings → Service accounts → Generate new private key
    - Save as `scripts/service_account.json`
 
-2. **Install dependency:**
+2. **Create a virtual environment and install firebase-admin:**
    ```bash
+   cd scripts
+   python3 -m venv venv
+   source venv/bin/activate
    pip install firebase-admin
    ```
 
 3. **Run the script:**
    ```bash
-   cd scripts
    python3 seed_demo.py <USER_UID>
    ```
 
@@ -30,3 +32,8 @@ Creates a historical event + registration for an existing Firebase user so you c
 ## Finding the User's UID
 
 Firebase Console → Authentication → Users → copy the UID column.
+
+## Troubleshooting
+
+- **externally-managed-environment error:** Make sure you activated the venv (`source venv/bin/activate`) before running `pip install`
+- **ModuleNotFoundError:** The venv is not active — run `source venv/bin/activate` again
