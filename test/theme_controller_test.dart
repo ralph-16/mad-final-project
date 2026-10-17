@@ -7,11 +7,11 @@ import 'package:final_project/ui/core/theme_controller.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('defaults to system and toggles light and dark', () async {
+  test('defaults to light and toggles light and dark', () async {
     SharedPreferences.setMockInitialValues({});
     final c = ThemeController();
     await c.load();
-    expect(c.mode, ThemeMode.system);
+    expect(c.mode, ThemeMode.light);
 
     await c.toggle();
     expect(c.mode, ThemeMode.dark);

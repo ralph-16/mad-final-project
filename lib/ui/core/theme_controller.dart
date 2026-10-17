@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// the toggle switches explicitly between light and dark, and the
 /// choice persists across restarts.
 class ThemeController extends ChangeNotifier {
-  ThemeController([this._mode = ThemeMode.system]);
+  ThemeController([this._mode = ThemeMode.light]);
 
   static const _prefsKey = 'eventhub_theme_mode';
 

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../domain/models/event.dart';
 import 'theme.dart';
 
-/// Event card: image, name, date/time, location, category.
-/// 48dp targets, ripple feedback, no layout shift on press.
+/// Event card: modern flat design — rounded edge-to-edge image with an
+/// overlaid date badge, category pill and status chip; flat bordered card.
 class EventCard extends StatelessWidget {
   const EventCard({
     super.key,
@@ -26,71 +26,89 @@ class EventCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _ImageHeader(event: event),
+            Stack(
+              children: [
+                _ImageHeader(event: event),
+                Positioned(
+                  top: 12,
+                  left: 12,
+                  child: _CategoryTag(label: event.category),
+                ),
+                if (registered || event.isPast)
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: _OverlayBadge(
+                      child: registered
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.check_circle,
+                                    size: 16, color: Colors.white),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Registered',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Text(
+                              'Ended',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontStyle: FontStyle.italic,
+                                fontSize: 12,
+                              ),
+                            ),
+                    ),
+                  ),
+                Positioned(
+                  bottom: 12,
+                  left: 12,
+                  child: _DateBadge(dateTime: event.dateTime),
+                ),
+              ],
+            ),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      _CategoryTag(label: event.category),
-                      const Spacer(),
-                      if (registered)
-                        Semantics(
-                          label: 'Registered',
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.check_circle,
-                                  size: 18,
-                                  color: EventHubTheme.success),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Registered',
-                                style: TextStyle(
-                                  color: EventHubTheme.success,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (event.isPast)
-                        const Text('Ended',
-                            style:
-                                TextStyle(fontStyle: FontStyle.italic)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
                   Text(
                     event.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: EventHubTheme.display(
                       context,
-                      Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w600),
+                      Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${formatEventDate(event.dateTime)} · ${formatEventTime(event.dateTime)}',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(Icons.place_outlined, size: 16),
+                      const Icon(Icons.place_outlined,
+                          size: 16, color: EventHubTheme.mutedFg),
                       const SizedBox(width: 4),
-                      Expanded(child: Text(event.locationName)),
+                      Expanded(
+                        child: Text(
+                          event.locationName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: EventHubTheme.mutedFg, fontSize: 13),
+                        ),
+                      ),
                     ],
                   ),
                   if (event.description.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       event.description,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style:
                           Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -110,13 +128,79 @@ class EventCard extends StatelessWidget {
   }
 }
 
+/// Orange date chip pinned on the card image (month + day).
+class _DateBadge extends StatelessWidget {
+  const _DateBadge({required this.dateTime});
+  final DateTime dateTime;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: EventHubTheme.primary,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            _month(dateTime),
+            style: const TextStyle(
+              color: EventHubTheme.onPrimary,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              height: 1.1,
+            ),
+          ),
+          Text(
+            '${dateTime.day}',
+            style: const TextStyle(
+              color: EventHubTheme.onPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              height: 1.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _month(DateTime d) {
+  const months = [
+    'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+    'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
+  ];
+  return months[d.month - 1];
+}
+
+/// Translucent dark pill for Registered/Ended floating over the image.
+class _OverlayBadge extends StatelessWidget {
+  const _OverlayBadge({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: child,
+    );
+  }
+}
+
 class _ImageHeader extends StatelessWidget {
   const _ImageHeader({required this.event});
   final Event event;
 
   @override
   Widget build(BuildContext context) {
-    const height = 160.0;
+    const height = 150.0;
     if (event.imageUrl.isEmpty) {
       return Container(
         height: height,
@@ -171,14 +255,20 @@ class _CategoryTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: scheme.primary.withValues(alpha: 0.12),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(label, style: TextStyle(color: scheme.primary)),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: EventHubTheme.primary,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

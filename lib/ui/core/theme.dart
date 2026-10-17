@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 
-/// EventHub tokens: Sunny Day palette (vibrant, warm, approachable).
-/// Orange carries primary actions; golden/pale yellows are accents;
-/// warm off-white is the app surface. Pale yellows are never text.
+/// EventHub tokens: Sunny Sunrise palette (modern mobile look: flat cards,
+/// generous radius, orange primary on warm off-white).
+/// Orange carries primary actions; pale oranges are accents only;
+/// pale tints are never body text.
 class EventHubTheme {
-  static const primary = Color(0xFFFF7A00);
+  static const primary = Color(0xFFEA580C);
   static const onPrimary = Color(0xFF1A1206);
-  static const softOrange = Color(0xFFFFA94D);
-  static const golden = Color(0xFFFFD166);
-  static const paleYellow = Color(0xFFFFE8A3);
-  static const background = Color(0xFFFFF7E6);
-  static const foreground = Color(0xFF231A0E);
+  static const softOrange = Color(0xFFF97316);
+  static const golden = Color(0xFFFDBA74);
+  static const paleYellow = Color(0xFFFFE4D0);
+  static const background = Color(0xFFFFF7ED);
+  static const foreground = Color(0xFF1C1917);
   static const card = Colors.white;
-  static const muted = Color(0xFFFFF1CF);
+  static const muted = Color(0xFFF8E7D8);
   static const mutedFg = Color(0xFF6B4E2E);
-  static const border = Color(0xFFF0D49A);
+  static const border = Color(0xFFF1DECD);
   static const danger = Color(0xFFB3261E);
   static const onDanger = Colors.white;
   static const success = Color(0xFF2E7D32);
   static const onSuccess = Colors.white;
 
-  // Warm dark-mode counterparts keep the sunny identity after lights-out.
+  // Dark-mode counterparts: neutral charcoal with the same orange identity.
   static const _darkBg = Color(0xFF1B130C);
   static const _darkSurface = Color(0xFF2A1F14);
   static const _darkText = Color(0xFFFFF3E0);
@@ -36,23 +37,23 @@ class EventHubTheme {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: scheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: scheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: scheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: scheme.error, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: scheme.outlineVariant),
         ),
       );
@@ -65,7 +66,7 @@ class EventHubTheme {
       onPrimaryContainer: foreground,
       secondary: softOrange,
       onSecondary: onPrimary,
-      secondaryContainer: golden,
+      secondaryContainer: paleYellow,
       onSecondaryContainer: foreground,
       tertiary: golden,
       onTertiary: foreground,
@@ -88,26 +89,64 @@ class EventHubTheme {
         bodyColor: foreground,
         displayColor: foreground,
       ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: background,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+      ),
+      cardTheme: const CardThemeData(
+        elevation: 0,
+        color: card,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          side: BorderSide(color: border),
+        ),
+      ),
       chipTheme: base.chipTheme.copyWith(
-        selectedColor: golden,
-        secondarySelectedColor: golden,
-        checkmarkColor: foreground,
+        selectedColor: primary,
+        secondarySelectedColor: primary,
+        checkmarkColor: onPrimary,
         labelStyle: base.textTheme.labelLarge,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(64, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: base.textTheme.labelLarge
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(64, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: base.textTheme.labelLarge
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: foreground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         contentTextStyle: base.textTheme.bodyMedium?.copyWith(
           color: background,
         ),
       ),
       dialogTheme: const DialogThemeData(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
+          borderRadius: BorderRadius.all(Radius.circular(24)),
         ),
       ),
       navigationBarTheme: base.navigationBarTheme.copyWith(
         backgroundColor: background,
+        surfaceTintColor: Colors.transparent,
         indicatorColor: paleYellow,
       ),
       inputDecorationTheme: _inputs(scheme),
