@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 
-/// EventHub tokens: Sunny Sunrise palette (modern mobile look: flat cards,
-/// generous radius, orange primary on warm off-white).
-/// Orange carries primary actions; pale oranges are accents only;
-/// pale tints are never body text.
+/// EventHub tokens: clean white surface with orange branding.
+/// White background, flat cards with hairline borders, orange primary.
 class EventHubTheme {
   static const primary = Color(0xFFEA580C);
   static const onPrimary = Color(0xFF1A1206);
   static const softOrange = Color(0xFFF97316);
   static const golden = Color(0xFFFDBA74);
   static const paleYellow = Color(0xFFFFE4D0);
-  static const background = Color(0xFFFFF7ED);
-  static const foreground = Color(0xFF1C1917);
+  static const background = Color(0xFFFFFFFF);
+  static const foreground = Color(0xFF1A1A1A);
   static const card = Colors.white;
-  static const muted = Color(0xFFF8E7D8);
-  static const mutedFg = Color(0xFF6B4E2E);
-  static const border = Color(0xFFF1DECD);
+  static const muted = Color(0xFFF5F5F5);
+  static const mutedFg = Color(0xFF6B7280);
+  static const border = Color(0xFFE5E5E5);
   static const danger = Color(0xFFB3261E);
   static const onDanger = Colors.white;
   static const success = Color(0xFF2E7D32);
@@ -33,7 +31,7 @@ class EventHubTheme {
   static InputDecorationTheme _inputs(ColorScheme scheme) =>
       InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surface,
+        fillColor: scheme.surfaceContainerHighest,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         enabledBorder: OutlineInputBorder(
@@ -75,7 +73,7 @@ class EventHubTheme {
       surfaceContainerHighest: muted,
       onSurfaceVariant: mutedFg,
       outline: border,
-      outlineVariant: paleYellow,
+      outlineVariant: border,
       error: danger,
       onError: onDanger,
     );
