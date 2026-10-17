@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../domain/models/event.dart';
 import 'theme.dart';
 
-/// Event card: modern flat design — rounded edge-to-edge image with an
-/// overlaid date badge, category pill and status chip; flat bordered card.
+/// Event card: full-bleed image with overlaid text and badges.
+/// The image fills the entire card; text sits on a gradient scrim.
 class EventCard extends StatelessWidget {
   const EventCard({
     super.key,
@@ -17,163 +17,128 @@ class EventCard extends StatelessWidget {
   final bool registered;
   final VoidCallback? onTap;
 
+  static const _cardHeight = 220.0;
+
   @override
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Stack(
-              children: [
-                _ImageHeader(event: event),
+        child: SizedBox(
+          height: _cardHeight,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _ImageHeader(event: event),
+              // Bottom gradient scrim for text readability
+              const Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.transparent, Colors.black87],
+                      stops: [0.35, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+              // Top-left: category pill
+              Positioned(
+                top: 12,
+                left: 12,
+                child: _CategoryTag(label: event.category),
+              ),
+              // Top-right: status badge
+              if (registered || event.isPast)
                 Positioned(
                   top: 12,
-                  left: 12,
-                  child: _CategoryTag(label: event.category),
-                ),
-                if (registered || event.isPast)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: _OverlayBadge(
-                      child: registered
-                          ? Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.check_circle,
-                                    size: 16, color: Colors.white),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Registered',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                  ),
+                  right: 12,
+                  child: _OverlayBadge(
+                    child: registered
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.check_circle,
+                                  size: 16, color: Colors.white),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Registered',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
                                 ),
-                              ],
-                            )
-                          : Text(
-                              'Ended',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontStyle: FontStyle.italic,
-                                fontSize: 12,
                               ),
+                            ],
+                          )
+                        : Text(
+                            'Ended',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
                             ),
-                    ),
+                          ),
                   ),
-                Positioned(
-                  bottom: 12,
-                  left: 12,
-                  child: _DateBadge(dateTime: event.dateTime),
                 ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    event.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: EventHubTheme.display(
-                      context,
-                      Theme.of(context).textTheme.titleLarge,
+              // Bottom: event info overlaid on image
+              Positioned(
+                left: 14,
+                right: 14,
+                bottom: 14,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      event.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.place_outlined,
-                          size: 16, color: EventHubTheme.mutedFg),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          event.locationName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              color: EventHubTheme.mutedFg, fontSize: 13),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.place_outlined,
+                            size: 14, color: Colors.white70),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            event.locationName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                color: Colors.white70, fontSize: 12),
+                          ),
                         ),
+                      ],
+                    ),
+                    if (event.description.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        event.description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Colors.white60, fontSize: 11),
                       ),
                     ],
-                  ),
-                  if (event.description.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      event.description,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style:
-                          Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                    ),
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-}
-
-/// Orange date chip pinned on the card image (month + day).
-class _DateBadge extends StatelessWidget {
-  const _DateBadge({required this.dateTime});
-  final DateTime dateTime;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: EventHubTheme.primary,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            _month(dateTime),
-            style: const TextStyle(
-              color: EventHubTheme.onPrimary,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              height: 1.1,
-            ),
-          ),
-          Text(
-            '${dateTime.day}',
-            style: const TextStyle(
-              color: EventHubTheme.onPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              height: 1.1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-String _month(DateTime d) {
-  const months = [
-    'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-    'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
-  ];
-  return months[d.month - 1];
 }
 
 /// Translucent dark pill for Registered/Ended floating over the image.
@@ -200,10 +165,8 @@ class _ImageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const height = 150.0;
     if (event.imageUrl.isEmpty) {
       return Container(
-        height: height,
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Center(
           child: Icon(Icons.event_outlined,
@@ -214,11 +177,9 @@ class _ImageHeader extends StatelessWidget {
     if (isAssetImage(event.imageUrl)) {
       return Image.asset(
         event.imageUrl,
-        height: height,
         fit: BoxFit.cover,
         semanticLabel: '${event.name} image',
         errorBuilder: (c, e, s) => Container(
-          height: height,
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: const Center(
             child: Icon(Icons.broken_image_outlined,
@@ -229,16 +190,12 @@ class _ImageHeader extends StatelessWidget {
     }
     return Image.network(
       event.imageUrl,
-      height: height,
       fit: BoxFit.cover,
       semanticLabel: '${event.name} image',
       loadingBuilder: (c, child, progress) => progress == null
           ? child
-          : const SizedBox(
-              height: height,
-              child: Center(child: CircularProgressIndicator())),
+          : const Center(child: CircularProgressIndicator()),
       errorBuilder: (c, e, s) => Container(
-        height: height,
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Center(
           child: Icon(Icons.broken_image_outlined,
