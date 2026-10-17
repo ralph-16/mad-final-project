@@ -106,6 +106,19 @@ class EventCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
+                        const Icon(Icons.event_outlined,
+                            size: 14, color: Colors.white70),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${formatEventDate(event.dateTime)} · ${formatEventTime(event.dateTime)}',
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
                         const Icon(Icons.place_outlined,
                             size: 14, color: Colors.white70),
                         const SizedBox(width: 4),
