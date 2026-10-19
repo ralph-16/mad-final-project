@@ -3,14 +3,8 @@ import 'dart:async' show Timer;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
-import 'package:timezone/timezone.dart' as tz;
-
-/// Reminder contract. Registration still works when permission is denied;
-/// the ViewModel then shows a notice instead of scheduling.
-abstract class NotificationService {
+import 'package:timezone/timezone.dart' as tz;abstract class NotificationService {
   Future<bool> requestPermission();
-
-  /// Shows a notification right away (e.g. registration confirmation).
   Future<void> showNow({
     required int id,
     required String title,
@@ -25,19 +19,11 @@ abstract class NotificationService {
   });
   Future<void> cancelReminder(int id);
 }
-
-/// Stable positive ID per event for schedule/cancel pairing.
 int reminderIdFor(String eventId) => eventId.hashCode & 0x7fffffff;
-
-/// One hour before start, per spec.
 DateTime reminderTimeFor(DateTime start) =>
     start.subtract(const Duration(hours: 1));
-
-/// Distinct ID per event so confirmation and reminder don't collide.
 int confirmationIdFor(String eventId) =>
     reminderIdFor(eventId) ^ 0x1fffffff;
-
-/// Human phrase for how far from now [when] is, e.g. 'in 2 days'.
 String timeUntilLabel(DateTime when) {
   final d = when.difference(DateTime.now());
   if (d.inMinutes < 1) return 'very soon';
@@ -56,28 +42,20 @@ class LocalNotificationService implements NotificationService {
   LocalNotificationService() : _plugin = FlutterLocalNotificationsPlugin();
 
   final FlutterLocalNotificationsPlugin _plugin;
-  bool _ready = false;
-
-  /// Web fallback timers for reminders keyed by notification ID.
-  ///
-  /// Browsers cannot schedule notifications while closed, so the 1-hour
-  /// reminder is kept alive with a Dart timer while the app tab is open.
-  final Map<int, Timer> _webTimers = {};
+  bool _ready = false;  final Map<int, Timer> _webTimers = {};
 
   Future<bool> _ensureReady() async {
     if (_ready) return true;
     try {
       tzdata.initializeTimeZones();
-    } catch (_) {
-      // Timezone DB init failure is non-fatal; local time is used.
-    }
+    } catch (_) {    }
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const darwin = DarwinInitializationSettings();
     try {
       final ok = await _plugin.initialize(
         settings: const InitializationSettings(android: android, iOS: darwin),
       );
-      _ready = ok ?? true; // web returns true/false; some return null
+      _ready = ok ?? true;
     } catch (e) {
       debugPrint('Notification init failed: $e');
     }
@@ -146,10 +124,8 @@ class LocalNotificationService implements NotificationService {
     required String body,
     required DateTime when,
   }) async {
-    if (when.isBefore(DateTime.now())) return; // past: nothing to remind
-    if (kIsWeb) {
-      // Browsers have no OS-level scheduler: show via timer while open.
-      try {
+    if (when.isBefore(DateTime.now())) return;
+    if (kIsWeb) {      try {
         await _ensureReady();
         _webTimers.remove(id)?.cancel();
         _webTimers[id] = Timer(when.difference(DateTime.now()), () async {
@@ -194,8 +170,6 @@ class LocalNotificationService implements NotificationService {
     }
   }
 }
-
-/// Fallback used when permission is denied or plugins unavailable.
 class NoopNotificationService implements NotificationService {
   @override
   Future<bool> requestPermission() async => false;

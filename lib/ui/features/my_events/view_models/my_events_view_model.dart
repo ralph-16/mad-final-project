@@ -4,11 +4,7 @@ import '../../../../data/services/event_repository.dart';
 import '../../../../data/services/notification_service.dart';
 import '../../../../data/services/registration_repository.dart';
 import '../../../../domain/models/event.dart';
-import '../../../../domain/models/registration.dart';
-
-/// My Events + History state: registrations joined with event details.
-/// Past is defined by the event's scheduled date/time.
-class MyEventsViewModel extends ChangeNotifier {
+import '../../../../domain/models/registration.dart';class MyEventsViewModel extends ChangeNotifier {
   MyEventsViewModel({
     required this.registrations,
     required this.events,
@@ -23,8 +19,6 @@ class MyEventsViewModel extends ChangeNotifier {
   Map<String, Event> _byId = {};
   bool isLoading = true;
   String? errorMessage;
-
-  /// One-shot message for SnackBars; cleared after read.
   String? notice;
   bool remindersAvailable = true;
 
@@ -65,8 +59,6 @@ class MyEventsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  /// Returns true on success. Sets [notice] for the UI to show.
   Future<bool> register(String studentId, Event event) async {
     if (event.isPast) {
       notice = 'Registration is closed: this event has passed.';
@@ -83,13 +75,9 @@ class MyEventsViewModel extends ChangeNotifier {
       notice = 'Registration failed. Try again.';
       notifyListeners();
       return false;
-    }
-    // Confirmation + reminder are best-effort: registration stands either way.
-    final granted = await notifications.requestPermission();
+    }    final granted = await notifications.requestPermission();
     remindersAvailable = granted;
-    if (granted) {
-      // Immediate confirmation naming how far out the event is.
-      await notifications.showNow(
+    if (granted) {      await notifications.showNow(
         id: confirmationIdFor(event.id),
         title: 'Registration confirmed',
         body:
@@ -124,8 +112,6 @@ class MyEventsViewModel extends ChangeNotifier {
     await load(studentId);
     return true;
   }
-
-  /// Reads and clears [notice].
   String? takeNotice() {
     final n = notice;
     notice = null;

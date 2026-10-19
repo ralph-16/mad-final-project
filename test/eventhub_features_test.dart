@@ -35,7 +35,7 @@ void main() {
       expect(counts.values.skip(1).fold<int>(0, (a, b) => a + b),
           vm.all.length);
       expect(counts['Sports'], 1);
-      expect(counts['Academic'], 2); // quiz bee + past robotics
+      expect(counts['Academic'], 2);
       for (final c in Event.categories) {
         expect(
           counts[c],

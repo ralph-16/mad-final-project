@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../../data/services/auth_service.dart';
-
-/// Auth UI state. Errors are user-facing strings, never raw codes.
 class AuthViewModel extends ChangeNotifier {
   AuthViewModel(this._auth) {
     _sub = _auth.userIdChanges.listen((id) {
@@ -21,16 +19,8 @@ class AuthViewModel extends ChangeNotifier {
   bool get signedIn => userId != null;
 
   bool isLoading = false;
-  String? errorMessage;
-
-  /// Password-reset flow state. Kept separate from [errorMessage] so the
-  /// reset dialog shows its own inline result without touching the form.
-  String? resetError;
-  String? resetInfo;
-
-  /// Clears a stale form error as soon as the user starts correcting input
-  /// (or switches modes), so old messages never linger over fresh typing.
-  void clearError() {
+  String? errorMessage;  String? resetError;
+  String? resetInfo;  void clearError() {
     if (errorMessage != null) {
       errorMessage = null;
       notifyListeners();
@@ -50,11 +40,7 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _auth.signOut();
-  }
-
-  /// Sends a password-reset email. Returns true when the request was
-  /// accepted. Loading always resets so the form stays usable.
-  Future<bool> sendPasswordReset(String email) async {
+  }  Future<bool> sendPasswordReset(String email) async {
     resetError = null;
     resetInfo = null;
     isLoading = true;

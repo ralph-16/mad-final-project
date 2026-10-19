@@ -1,25 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../domain/models/event.dart';
-
-/// Opens an event in the student's personal calendar.
-///
-/// Implementation: a prefilled Google Calendar template URL, which works on
-/// Android, iOS (via browser), and web with no extra dependencies.
-///
-/// Assumption (documented): [Event] carries no end time, so the export uses
-/// [defaultEventDuration] after the start. Change the constant — not the
-/// model — if the school standardizes event lengths.
-///
-/// Apple Calendar / .ics export is intentionally out of scope: it needs file
-/// writing + sharing (e.g. `share_plus`), disproportionate for this MVP.
-/// Returns false when nothing could handle the URL; never claims success.
-class CalendarLauncher {
-  /// Fallback event length used only because the model has no end time.
-  static const defaultEventDuration = Duration(hours: 2);
-
-  /// Pure builder (unit-testable): Google Calendar template URL for [event].
+import '../../domain/models/event.dart';class CalendarLauncher {  static const defaultEventDuration = Duration(hours: 2);
   static Uri googleCalendarUrl(Event event, {DateTime? nowUtc}) {
     final start = event.dateTime.toUtc();
     final end = start.add(defaultEventDuration);
@@ -49,8 +31,6 @@ class CalendarLauncher {
       return false;
     }
   }
-
-  /// UTC stamp in Google's `yyyyMMddTHHmmssZ` format (manual: no intl dep).
   static String _stamp(DateTime dt) {
     String p(int n, [int w = 2]) => n.toString().padLeft(w, '0');
     return '${p(dt.year, 4)}${p(dt.month)}${p(dt.day)}'

@@ -1,5 +1,3 @@
-// Regression tests for the auth form: the password field must stay
-// editable after a failed submission, and resubmission must work.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -9,11 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:final_project/data/services/auth_service.dart';
 import 'package:final_project/ui/core/theme_controller.dart';
 import 'package:final_project/ui/features/auth/view_models/auth_view_model.dart';
-import 'package:final_project/ui/features/auth/views/auth_view.dart';
-
-/// Fails the first sign-up (simulating e.g. email-already-in-use),
-/// then succeeds — proving recovery without reopening the form.
-class _FlakyAuth implements AuthService {
+import 'package:final_project/ui/features/auth/views/auth_view.dart';class _FlakyAuth implements AuthService {
   final _controller = StreamController<String?>.broadcast();
   String? _uid;
   int signUpCalls = 0;
@@ -80,20 +74,14 @@ void main() {
     await tester.enterText(_passwordField, 'secret123');
     await tester.tap(find.text('Create account'));
     await tester.pumpAndSettle();
-
-    // Failure is reported…
     expect(
         find.text(
             'An account with this email already exists. Try logging in.'),
-        findsOneWidget);
-    // …but the password field is still enabled and accepts corrections.
-    expect(tester.widget<TextField>(_passwordField).enabled, isTrue);
+        findsOneWidget);    expect(tester.widget<TextField>(_passwordField).enabled, isTrue);
     await tester.enterText(_passwordField, 'brandnew1');
     await tester.pump();
     expect(tester.widget<TextField>(_passwordField).controller?.text,
         'brandnew1');
-
-    // Correcting clears the stale error; resubmission succeeds.
     expect(find.textContaining('already exists'), findsNothing);
     await tester.tap(find.text('Create account'));
     await tester.pumpAndSettle();

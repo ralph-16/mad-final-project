@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import '../../../core/widgets.dart';
 import '../../my_events/view_models/my_events_view_model.dart';
 import '../view_models/discover_view_model.dart';
-
-/// Browse events + category filter. Tapping a card opens detail.
 class DiscoverView extends StatefulWidget {
   const DiscoverView({super.key, required this.onOpenDetail});
   final void Function(String eventId) onOpenDetail;

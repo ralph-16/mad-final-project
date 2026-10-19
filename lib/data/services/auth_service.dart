@@ -1,19 +1,11 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
-
-/// Auth contract. Firebase impl is used when configured,
-/// otherwise the app falls back to [MockAuthService].
-abstract class AuthService {
+import 'package:firebase_auth/firebase_auth.dart';abstract class AuthService {
   Stream<String?> get userIdChanges;
   String? get currentUserId;
   Future<void> signUp(String email, String password);
   Future<void> signIn(String email, String password);
-  Future<void> signOut();
-
-  /// Sends a password-reset email. Implementations must not reveal
-  /// whether the address has an account (see [friendlyResetError]).
-  Future<void> sendPasswordReset(String email);
+  Future<void> signOut();  Future<void> sendPasswordReset(String email);
 }
 
 String friendlyAuthError(Object e) {
@@ -37,10 +29,6 @@ String friendlyAuthError(Object e) {
   }
   return 'Something went wrong. Try again.';
 }
-
-/// User-facing messages for password-reset failures. Never exposes raw
-/// codes, and the unknown-address case is deliberately generic so the
-/// flow does not reveal whether an email has an account.
 String friendlyResetError(Object e) {
   if (e is FormatException) {
     return 'Enter a valid email address.';
@@ -93,8 +81,6 @@ class FirebaseAuthService implements AuthService {
   Future<void> sendPasswordReset(String email) =>
       _auth.sendPasswordResetEmail(email: email.trim());
 }
-
-/// In-memory fallback so the UI runs without Firebase setup.
 class MockAuthService implements AuthService {
   final _controller = StreamController<String?>.broadcast();
   final _passwords = <String, String>{};
@@ -138,11 +124,7 @@ class MockAuthService implements AuthService {
   Future<void> signOut() async {
     _current = null;
     _controller.add(null);
-  }
-
-  /// Accepts any well-formed address (no account enumeration in mocks)
-  /// and records it for verification. Never logs or stores passwords.
-  final resetSentTo = <String>[];
+  }  final resetSentTo = <String>[];
 
   @override
   Future<void> sendPasswordReset(String email) async {

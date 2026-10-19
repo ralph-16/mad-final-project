@@ -1,11 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../domain/models/event.dart';
-
-/// Opens the event location in a maps app/website.
-/// Returns false when nothing could handle the URL.
-class MapsLauncher {
+import '../../domain/models/event.dart';class MapsLauncher {
   static Future<bool> openEvent(Event event) async {
     final Uri uri;
     if (event.hasCoordinates) {

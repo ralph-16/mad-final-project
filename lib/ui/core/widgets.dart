@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/models/event.dart';
-import 'theme.dart';
-
-/// Event card: full-bleed image with overlaid text and badges.
-/// The image fills the entire card; text sits on a gradient scrim.
-class EventCard extends StatelessWidget {
+import 'theme.dart';class EventCard extends StatelessWidget {
   const EventCard({
     super.key,
     required this.event,
@@ -30,9 +26,7 @@ class EventCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              _ImageHeader(event: event),
-              // Bottom gradient scrim for text readability
-              const Positioned.fill(
+              _ImageHeader(event: event),              const Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -43,15 +37,11 @@ class EventCard extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-              // Top-left: category pill
-              Positioned(
+              ),              Positioned(
                 top: 12,
                 left: 12,
                 child: _CategoryTag(label: event.category),
-              ),
-              // Top-right: status badge
-              if (registered || event.isPast)
+              ),              if (registered || event.isPast)
                 Positioned(
                   top: 12,
                   right: 12,
@@ -82,9 +72,7 @@ class EventCard extends StatelessWidget {
                             ),
                           ),
                   ),
-                ),
-              // Bottom: event info overlaid on image
-              Positioned(
+                ),              Positioned(
                 left: 14,
                 right: 14,
                 bottom: 14,
@@ -153,8 +141,6 @@ class EventCard extends StatelessWidget {
     );
   }
 }
-
-/// Translucent dark pill for Registered/Ended floating over the image.
 class _OverlayBadge extends StatelessWidget {
   const _OverlayBadge({required this.child});
   final Widget child;
@@ -241,11 +227,7 @@ class _CategoryTag extends StatelessWidget {
       ),
     );
   }
-}
-
-/// 48dp category filter chips in a horizontal list.
-/// Pass [counts] (e.g. from DiscoverViewModel) to show per-category totals.
-class CategoryChips extends StatelessWidget {
+}class CategoryChips extends StatelessWidget {
   const CategoryChips({
     super.key,
     required this.options,
@@ -328,11 +310,7 @@ class EmptyState extends StatelessWidget {
   });
   final String message;
   final IconData? icon;
-
-  /// Optional calm explanation shown under the message (e.g. how to recover).
   final String? details;
-
-  /// Optional recovery action (e.g. "Clear filters").
   final String? actionLabel;
   final VoidCallback? onAction;
 
@@ -373,11 +351,7 @@ class EmptyState extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Reusable cancellation confirmation. Returns true only on explicit
-/// confirmation; dismissal or "Keep" leaves everything unchanged.
-Future<bool> confirmCancelRegistration(
+}Future<bool> confirmCancelRegistration(
   BuildContext context, {
   required String eventName,
 }) async {

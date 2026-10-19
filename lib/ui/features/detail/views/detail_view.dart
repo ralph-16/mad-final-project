@@ -8,11 +8,7 @@ import '../../../../domain/models/event.dart';
 import '../../../core/theme.dart';
 import '../../auth/view_models/auth_view_model.dart';
 import '../../discover/view_models/discover_view_model.dart';
-import '../../my_events/view_models/my_events_view_model.dart';
-
-/// Full event info + register/cancel + maps button.
-/// Route name: '/detail', argument: event ID string.
-class DetailView extends StatelessWidget {
+import '../../my_events/view_models/my_events_view_model.dart';class DetailView extends StatelessWidget {
   const DetailView({super.key, required this.eventId});
   final String eventId;
 

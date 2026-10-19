@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/models/event.dart';
-
-/// Event contract: Firestore when configured, mock otherwise.
 abstract class EventRepository {
   Stream<List<Event>> watchEvents();
   Future<List<Event>> fetchEvents();
@@ -26,11 +24,7 @@ class FirestoreEventRepository implements EventRepository {
     final s = await _col.orderBy('dateTime').get();
     return s.docs.map((d) => Event.fromMap(d.id, d.data())).toList();
   }
-}
-
-/// Sample events matching the spec's Firestore shape.
-/// One past event is included so History has content in mock mode.
-class MockEventRepository implements EventRepository {
+}class MockEventRepository implements EventRepository {
   List<Event> get _events {
     final now = DateTime.now();
     DateTime days(int d, int h) {

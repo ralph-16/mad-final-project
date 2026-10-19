@@ -1,6 +1,3 @@
-// Demo-presentation coverage: one student holding BOTH a historical and an
-// upcoming registration — the exact state the live demo requires.
-// Uses controlled mock data only; never touches the real presentation date.
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:final_project/data/services/event_repository.dart';

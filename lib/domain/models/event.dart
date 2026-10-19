@@ -1,10 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-/// Clean domain model for a school event.
-///
-/// Accepts both storage shapes so preloaded docs keep working:
-/// a `dateTime` Timestamp, or legacy `date` + `startTime` strings.
-class Event {
+import 'package:cloud_firestore/cloud_firestore.dart';class Event {
   Event({
     required this.id,
     required this.name,
@@ -48,9 +42,7 @@ class Event {
       dt = raw.toDate();
     } else if (raw is String) {
       dt = DateTime.tryParse(raw);
-    }
-    // Legacy shape: {date: '2026-11-15', startTime: '09:00'}.
-    dt ??= _fromLegacy(map['date'] as String?, map['startTime'] as String?);
+    }    dt ??= _fromLegacy(map['date'] as String?, map['startTime'] as String?);
     return Event(
       id: id,
       name: (map['name'] ?? '') as String,
@@ -83,11 +75,7 @@ class Event {
     return DateTime.tryParse('${date}T$t:00');
   }
 }
-
-/// Local asset images live under assets/; anything else is a network URL.
 bool isAssetImage(String path) => path.startsWith('assets/');
-
-/// Short date/time text without adding an intl dependency.
 String formatEventDate(DateTime dt) {
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',

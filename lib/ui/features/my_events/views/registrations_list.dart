@@ -4,11 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/widgets.dart';
 import '../../../../domain/models/event.dart';
 import '../../auth/view_models/auth_view_model.dart';
-import '../view_models/my_events_view_model.dart';
-
-/// Shared upcoming/past list. [showPast] false = My Events,
-/// true = Event History.
-class RegistrationsList extends StatefulWidget {
+import '../view_models/my_events_view_model.dart';class RegistrationsList extends StatefulWidget {
   const RegistrationsList({
     super.key,
     required this.showPast,
@@ -87,11 +83,7 @@ class _RegistrationsListState extends State<RegistrationsList> {
         },
       ),
     );
-  }
-
-  /// Swipe asks for confirmation first: nothing is deleted until the
-  /// student explicitly confirms. Dismissal keeps item and reminder.
-  Future<bool> _confirmCancel(
+  }  Future<bool> _confirmCancel(
       BuildContext context, MyEventsViewModel vm, Event event) async {
     final confirmed = await confirmCancelRegistration(
       context,

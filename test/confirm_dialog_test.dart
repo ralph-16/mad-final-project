@@ -1,6 +1,3 @@
-// Verifies the shared cancellation confirmation dialog: explicit
-// confirmation returns true, dismissal/Keep returns false with no side
-// effects (callers only delete after `true`).
 import 'dart:async';
 
 import 'package:flutter/material.dart';

@@ -4,11 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../view_models/auth_view_model.dart';
-import '../../../core/theme_controller.dart';
-
-/// Login + signup in one screen (toggle), email/password only per spec.
-/// Labels stay visible; errors render inline under the form.
-class AuthView extends StatefulWidget {
+import '../../../core/theme_controller.dart';class AuthView extends StatefulWidget {
   const AuthView({super.key});
 
   @override
@@ -211,11 +207,7 @@ class _AuthViewState extends State<AuthView> {
       context.read<AuthViewModel>().clearResetMessages();
     }
   }
-}
-
-/// Forgot-password dialog: confirm the account email, request the reset
-/// link, and report success/failure inline without leaving login.
-class _ForgotPasswordDialog extends StatefulWidget {
+}class _ForgotPasswordDialog extends StatefulWidget {
   const _ForgotPasswordDialog({required this.initialEmail});
   final String initialEmail;
 

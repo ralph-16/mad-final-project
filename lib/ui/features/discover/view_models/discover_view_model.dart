@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../data/services/event_repository.dart';
 import '../../../../domain/models/event.dart';
-
-/// Browse + filter UI state over [EventRepository].
 class DiscoverViewModel extends ChangeNotifier {
   DiscoverViewModel(this._repo);
 
@@ -20,8 +18,6 @@ class DiscoverViewModel extends ChangeNotifier {
 
   List<String> get categories =>
       [Event.allCategory, ...Event.categories];
-
-  /// Live per-category totals over the loaded events (All = everything).
   Map<String, int> get counts {
     final map = <String, int>{Event.allCategory: _events.length};
     for (final c in Event.categories) {
@@ -89,8 +85,6 @@ class DiscoverViewModel extends ChangeNotifier {
     searchQuery = query;
     notifyListeners();
   }
-
-  /// Resets category to All and clears the search (used by Clear filters).
   void clearFilters() {
     if (!hasActiveFilters) return;
     selectedCategory = Event.allCategory;

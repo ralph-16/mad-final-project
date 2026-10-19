@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-/// App-wide light/dark mode state. Defaults to the system setting;
-/// the toggle switches explicitly between light and dark, and the
-/// choice persists across restarts.
 class ThemeController extends ChangeNotifier {
   ThemeController([this._mode = ThemeMode.light]);
 
@@ -11,8 +7,6 @@ class ThemeController extends ChangeNotifier {
 
   ThemeMode _mode;
   ThemeMode get mode => _mode;
-
-  /// Icon reflecting what tapping will switch to (or auto when systemic).
   IconData get toggleIcon => switch (_mode) {
         ThemeMode.dark => Icons.light_mode_outlined,
         ThemeMode.light => Icons.dark_mode_outlined,
@@ -42,8 +36,6 @@ class ThemeController extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefsKey, mode.name);
   }
-
-  /// Toggles explicit light ↔ dark (system counts as light-side).
   Future<void> toggle() =>
       setMode(_mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
 }

@@ -40,8 +40,6 @@ void main() {
       expect(await vm.register(uid, event), isTrue);
       await vm.load(uid);
       expect(vm.upcoming.any((e) => e.id == event.id), isTrue);
-
-      // Duplicate: repository throws, ViewModel reports notice.
       expect(await vm.register(uid, event), isFalse);
       expect(vm.takeNotice(), contains('already registered'));
     });
@@ -62,8 +60,6 @@ void main() {
       const uid = 'student-3';
       final past = (await MockEventRepository().fetchEvents())
           .firstWhere((e) => e.isPast);
-
-      // Past registration is closed via UI; seed repo directly instead.
       final repo = MockRegistrationRepository();
       final vm2 = MyEventsViewModel(
         registrations: repo,

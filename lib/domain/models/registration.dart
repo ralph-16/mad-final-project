@@ -1,8 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-/// Links a student (Firebase Auth UID) to an event.
-/// Doc ID is deterministic (`${studentId}_${eventId}`) so a student
-/// cannot register twice for the same event.
 class Registration {
   Registration({
     required this.id,

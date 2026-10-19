@@ -1,13 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/models/registration.dart';
-
-/// Registration contract with duplicate guard via deterministic doc IDs.
 abstract class RegistrationRepository {
   Stream<List<Registration>> watchForStudent(String studentId);
   Future<List<Registration>> fetchForStudent(String studentId);
-
-  /// Throws [DuplicateRegistration] if already registered.
   Future<void> register(String studentId, String eventId);
   Future<void> cancel(String studentId, String eventId);
   Future<bool> isRegistered(String studentId, String eventId);
@@ -44,8 +40,6 @@ class FirestoreRegistrationRepository implements RegistrationRepository {
       final existing = await ref.get();
       if (existing.exists) throw const DuplicateRegistration();
     } on FirebaseException catch (e) {
-      // Old published rules deny get on not-yet-created docs.
-      // Treat as not-registered and let create enforce ownership.
       if (e.code != 'permission-denied') rethrow;
     }
     await ref.set(Registration(
@@ -77,8 +71,6 @@ class MockRegistrationRepository implements RegistrationRepository {
   @override
   Stream<List<Registration>> watchForStudent(String studentId) async* {
     yield _for(studentId);
-    // Re-emit is driven by fetch-after-mutate in the ViewModel,
-    // keeping the mock dependency-free.
   }
 
   @override

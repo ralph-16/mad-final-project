@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// EventHub tokens: clean white surface with orange branding.
-/// White background, flat cards with hairline borders, orange primary.
 class EventHubTheme {
   static const primary = Color(0xFFEA580C);
   static const onPrimary = Color(0xFF1A1206);
@@ -19,7 +17,6 @@ class EventHubTheme {
   static const success = Color(0xFF2E7D32);
   static const onSuccess = Colors.white;
 
-  // Dark-mode counterparts: neutral charcoal with the same orange identity.
   static const _darkBg = Color(0xFF1B130C);
   static const _darkSurface = Color(0xFF2A1F14);
   static const _darkText = Color(0xFFFFF3E0);
@@ -192,10 +189,6 @@ class EventHubTheme {
       ),
       inputDecorationTheme: _inputs(scheme),
     );
-  }
-
-  /// Display face for headlines. Uses the Material 3 default type
-  /// ramp (google_fonts dropped: v9 binds a forked TextTheme type).
-  static TextStyle? display(BuildContext context, TextStyle? base) =>
+  }  static TextStyle? display(BuildContext context, TextStyle? base) =>
       base?.copyWith(fontWeight: FontWeight.w600, letterSpacing: -0.25);
 }

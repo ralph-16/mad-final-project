@@ -1,6 +1,3 @@
-// Regression for: right after login, an already-registered event showed
-// "Register for this event" on the detail page because MyEventsViewModel
-// only loaded registrations when the My Events / History tab was opened.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +21,6 @@ void main() {
     await auth.signUp('student@test.edu', 'secret123');
     final authVM = AuthViewModel(auth);
     final uid = authVM.userId!;
-
-    // Registration made in an earlier session.
     final registrationRepository = MockRegistrationRepository();
     final event = (await MockEventRepository().fetchEvents())
         .firstWhere((e) => e.name == 'Student Organization Fair');
@@ -62,16 +57,12 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-
-    // Log-in flow: Discover is the entry tab — no My Events visit.
     final card = find.text('Student Organization Fair');
     await tester.ensureVisible(card);
     await tester.pumpAndSettle();
     await tester.tap(card);
     await tester.pumpAndSettle();
     expect(find.byType(DetailView), findsOneWidget);
-
-    // Action buttons sit below the fold in the detail list.
     final cancel = find.text('Cancel registration');
     await tester.scrollUntilVisible(
       cancel,
