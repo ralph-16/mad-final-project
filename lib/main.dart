@@ -20,8 +20,6 @@ import 'ui/features/discover/views/discover_view.dart';
 import 'ui/features/my_events/view_models/my_events_view_model.dart';
 import 'ui/features/my_events/views/registrations_list.dart';
 
-/// Tries Firebase; falls back to in-memory services so the UI
-/// runs before `flutterfire configure` has been done.
 Future<bool> _initFirebase() async {
   try {
     await Firebase.initializeApp(
@@ -99,8 +97,6 @@ class EventHubApp extends StatelessWidget {
   }
 }
 
-/// Signed-out students see auth; signed-in see the tabbed app.
-/// Registrations stay per-account (Story 1) via the Auth UID.
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -125,10 +121,6 @@ class _HomeShellState extends State<HomeShell> {
   @override
   void initState() {
     super.initState();
-    // Register/Cancel state on the detail page and Discover badges depend
-    // on this student's registrations, so fetch them at sign-in as well —
-    // not only when the My Events / History tabs open, since Discover is
-    // the entry tab and its detail view reads MyEventsViewModel directly.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final userId = context.read<AuthViewModel>().userId;
