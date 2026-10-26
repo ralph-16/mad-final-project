@@ -122,7 +122,7 @@ class _HomeShellState extends State<HomeShell> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (mounted) return;
       final userId = context.read<AuthViewModel>().userId;
       if (userId != null) {
         context.read<MyEventsViewModel>().load(userId);
